@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create CI environment
+        run: cp .env.example .env
+
+      - name: Build and start containers
+        run: docker compose up --build -d
+
+      - name: Test API health
+        run: curl --retry 10 --retry-delay 2 --retry-all-errors --fail http://localhost:8000/health
+
+      - name: Show container status
+        run: docker compose ps
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down
