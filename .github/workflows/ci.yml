@@ -21,7 +21,12 @@ jobs:
         run: curl --retry 10 --retry-delay 2 --retry-all-errors --fail http://localhost:8000/health
 
       - name: Show container status
-        run: docker compose ps
+        if: always()
+        run: docker compose ps -a
+
+      - name: show container logs
+        if: always()
+        run: docker compose logs
 
       - name: Stop containers
         if: always()
