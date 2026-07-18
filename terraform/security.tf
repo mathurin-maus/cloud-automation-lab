@@ -25,9 +25,18 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
   from_port   = 22
   to_port     = 22
   ip_protocol = "tcp"
-  cidr_ipv4   = "82.66.55.29/32"
+  cidr_ipv4   = var.allowed_ssh_cidr
 }
 
+resource "aws_vpc_security_group_ingress_rule" "api" {
+  security_group_id = aws_security_group.ssh.id
+
+  description = "API access from my public IP"
+  from_port   = 8000
+  to_port     = 8000
+  ip_protocol = "tcp"
+  cidr_ipv4   = var.allowed_ssh_cidr
+}
 
 ###################################
 # Security Group Egress Rules

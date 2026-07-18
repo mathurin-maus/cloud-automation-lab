@@ -36,6 +36,9 @@ resource "aws_instance" "web" {
   key_name                    = aws_key_pair.main.key_name
   associate_public_ip_address = true
 
+  user_data                   = file("${path.module}/scripts/install-docker.sh")
+  user_data_replace_on_change = true
+
   tags = {
     Name = "cloud-automation-lab-ec2"
   }
