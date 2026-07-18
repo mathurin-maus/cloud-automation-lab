@@ -25,7 +25,7 @@ def health():
                 print(resultat, flush=True)
 
                 if  resultat[0] == 1:
-                    return "Database Ok"
+                    return "Database OK, Hello from github Actions"
     except psycopg.Error:
         return "Database ERROR", 503
     

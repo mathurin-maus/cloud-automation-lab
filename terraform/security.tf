@@ -25,7 +25,7 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
   from_port   = 22
   to_port     = 22
   ip_protocol = "tcp"
-  cidr_ipv4   = var.allowed_ssh_cidr
+  cidr_ipv4   = "0.0.0.0/0"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "api" {
