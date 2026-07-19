@@ -10,6 +10,7 @@ This repository is continuously evolving and will progressively integrate additi
 
 > ⚠️ This repository is actively developed and continuously improved as part of my Cloud / DevOps learning journey.
 
+
 ## Architecture
 
 ### Runtime Architecture
@@ -24,6 +25,7 @@ The application is hosted on an AWS EC2 instance. Docker Compose orchestrates th
 
 Each push to the main branch automatically triggers the deployment pipeline. GitHub Actions builds the Docker image, publishes it to GitHub Container Registry (GHCR), then connects to the EC2 instance via SSH to pull the latest image and restart the application using Docker Compose.
 
+
 ## Technologies
 
 | Category | Technologies |
@@ -35,6 +37,7 @@ Each push to the main branch automatically triggers the deployment pipeline. Git
 | Cloud | AWS (EC2, VPC, Security Groups) |
 | CI/CD | GitHub Actions, GitHub Container Registry (GHCR) |
 | Version Control | Git, GitHub |
+
 
 ## Project Structure
 
@@ -70,6 +73,7 @@ cloud-automation-lab/
 └── README.md
 ```
 
+
 ## Getting Started
 
 ### Prerequisites
@@ -88,6 +92,16 @@ Before running the project, make sure you have the following installed:
 git clone https://github.com/mathurin-maus/cloud-automation-lab.git
 cd cloud-automation-lab
 ```
+
+### Configure environment variables
+
+Create your local environment file from the provided template:
+
+```bash
+cp .env.example .env
+```
+
+Update the environment variables if necessary.
 
 ### Run locally
 
@@ -119,7 +133,7 @@ terraform init
 terraform plan
 terraform apply
 ```
-```md
+
 > **Note:** Additional deployment instructions and configuration details will be added as the project evolves.
 
 
@@ -138,6 +152,7 @@ GET /health
 
 Database OK, Hello from GitHub Actions
 ```
+
 
 ## Roadmap
 
