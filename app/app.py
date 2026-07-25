@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "API Python OK - Docker Compose fonctionne !"
+    return "API Python OK - Docker Compose fonctionne correctement !"
 
 @app.route("/health")
 def health():
