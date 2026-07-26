@@ -1,4 +1,4 @@
-# Environment files
+# Environment
 .env
 
 # Python
@@ -6,7 +6,11 @@ __pycache__/
 *.py[cod]
 
 # Terraform
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.*
-terraform/terraform.tfvars
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# Terraform plan files
+*.tfplan
