@@ -4,13 +4,12 @@
 ###################################
 
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
 
   tags = {
-    Name = "cloud-automation-lab-vpc"
+    Name = "${var.project_name}-vpc"
   }
 }
-
 
 ###################################
 # Subnet
@@ -18,14 +17,13 @@ resource "aws_vpc" "main" {
 
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "eu-west-3a"
+  cidr_block        = var.public_subnet_cidr
+  availability_zone = var.availability_zone
 
   tags = {
-    Name = "cloud-automation-lab-public-subnet"
+    Name = "${var.project_name}-public-subnet"
   }
 }
-
 
 ###################################
 # Internet Gateway
@@ -35,10 +33,9 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "cloud-automation-lab-igw"
+    Name = "${var.project_name}-igw"
   }
 }
-
 
 ###################################
 # Route Table
@@ -48,10 +45,9 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "cloud-automation-lab-public-rt"
+    Name = "${var.project_name}-public-rt"
   }
 }
-
 
 ###################################
 # Route
@@ -63,7 +59,6 @@ resource "aws_route" "internet" {
 
   gateway_id = aws_internet_gateway.main.id
 }
-
 
 ###################################
 # Association
