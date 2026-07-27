@@ -49,6 +49,6 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -var-file="ci.tfvars"
 
 

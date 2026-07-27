@@ -11,6 +11,7 @@ __pycache__/
 *.tfstate.*
 *.tfvars
 !*.tfvars.example
+!**/ci.tfvars
 
 # Terraform plan files
 *.tfplan
