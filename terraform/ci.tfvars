@@ -3,9 +3,17 @@ project_name = "cloud-automation-lab"
 
 aws_region = "eu-west-3"
 
-vpc_cidr           = "10.0.0.0/16"
-public_subnet_cidr = "10.0.1.0/24"
-availability_zone  = "eu-west-3a"
+vpc_cidr = "10.0.0.0/16"
+
+public_subnet_cidrs = [
+  "10.0.1.0/24",
+  "10.0.2.0/24"
+]
+
+availability_zones = [
+  "eu-west-3a",
+  "eu-west-3b"
+]
 
 instance_type = "t3.micro"
 

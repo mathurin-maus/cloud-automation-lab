@@ -14,13 +14,14 @@ variable "vpc_cidr" {
 }
 
 
-variable "public_subnet_cidr" {
-  type = string
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for the public subnets"
+  type        = list(string)
 }
 
-
-variable "availability_zone" {
-  type = string
+variable "availability_zones" {
+  description = "Availability Zones used by the public subnets"
+  type        = list(string)
 }
 
 
