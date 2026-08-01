@@ -60,14 +60,38 @@ jobs:
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_USERNAME: ${{ github.actor }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: GHCR_TOKEN,GHCR_USERNAME,DB_NAME,DB_USER,DB_PASSWORD
           script: |
             set -e
 
             cd /home/ubuntu
+
+            echo "$GHCR_TOKEN" | docker login ghcr.io \
+              --username "$GHCR_USERNAME" \
+              --password-stdin
+
+            cat > .env <<EOF
+            DB_HOST=postgres
+            DB_PORT=5432
+            DB_NAME=$DB_NAME
+            DB_USER=$DB_USER
+            DB_PASSWORD=$DB_PASSWORD
+            POSTGRES_DB=$DB_NAME
+            POSTGRES_USER=$DB_USER
+            POSTGRES_PASSWORD=$DB_PASSWORD
+            EOF
+
+            chmod 600 .env
 
             export IMAGE_TAG=${{ github.sha }}
 
