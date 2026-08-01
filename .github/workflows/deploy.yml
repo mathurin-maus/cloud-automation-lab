@@ -9,6 +9,8 @@ on:
       - "docker-compose.prod.yml"
       - ".github/workflows/deploy.yml"
 
+  workflow_dispatch:
+
 permissions:
   contents: read
   packages: write

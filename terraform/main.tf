@@ -11,11 +11,25 @@ module "network" {
 module "compute" {
   source = "./modules/compute"
 
-  project_name     = var.project_name
-  vpc_id           = module.network.vpc_id
-  public_subnet_id = module.network.public_subnet_ids[0]
-  allowed_ssh_cidr = var.allowed_ssh_cidr
-  instance_type    = var.instance_type
-  public_key_path  = var.public_key_path
-  user_data_path   = var.user_data_path
+  project_name          = var.project_name
+  vpc_id                = module.network.vpc_id
+  public_subnet_id      = module.network.public_subnet_ids[0]
+  allowed_ssh_cidr      = var.allowed_ssh_cidr
+  instance_type         = var.instance_type
+  public_key_path       = var.public_key_path
+  user_data_path        = var.user_data_path
+  alb_security_group_id = module.load_balancer.alb_security_group_id
+}
+
+module "load_balancer" {
+  source = "./modules/load_balancer"
+
+  project_name      = var.project_name
+  vpc_id            = module.network.vpc_id
+  public_subnet_ids = module.network.public_subnet_ids
+}
+
+resource "aws_lb_target_group_attachment" "app" {
+  target_group_arn = module.load_balancer.target_group_arn
+  target_id        = module.compute.ec2_id
 }

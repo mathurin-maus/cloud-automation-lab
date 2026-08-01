@@ -90,11 +90,11 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
 resource "aws_vpc_security_group_ingress_rule" "api" {
   security_group_id = aws_security_group.ssh.id
 
-  description = "API access from my public IP"
-  from_port   = 8000
-  to_port     = 8000
-  ip_protocol = "tcp"
-  cidr_ipv4   = var.allowed_ssh_cidr
+  description                  = "API access from my public IP"
+  from_port                    = 8000
+  to_port                      = 8000
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.alb_security_group_id
 }
 
 ###################################

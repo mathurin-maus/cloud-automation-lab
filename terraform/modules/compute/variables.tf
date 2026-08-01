@@ -26,3 +26,8 @@ variable "public_key_path" {
 variable "user_data_path" {
   type = string
 }
+
+variable "alb_security_group_id" {
+  description = "ID of the ALB Security Group allowed to reach the application"
+  type        = string
+}

@@ -45,3 +45,7 @@ variable "user_data_path" {
 }
 
 
+variable "application_port" {
+  type    = number
+  default = 8000
+}
