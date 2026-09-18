@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Deploy Docker Image
 
 on:
   push:
@@ -6,14 +6,17 @@ on:
       - main
     paths:
       - "app/**"
-      - "docker-compose.prod.yml"
       - ".github/workflows/deploy.yml"
 
   workflow_dispatch:
 
 permissions:
+  id-token: write
   contents: read
-  packages: write
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REPOSITORY: cloud-automation-lab-ecr-repository
 
 jobs:
   build-and-push:
@@ -23,79 +26,50 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          role-to-assume: arn:aws:iam::017367776521:role/cloud-automation-lab-github-deploy-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker image
         run: |
           docker build \
-            -t ghcr.io/mathurin-maus/cloud-automation-api:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
             ./app
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/mathurin-maus/cloud-automation-api:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
+      - name: Update desired image tag
+        run: |
+          aws ssm put-parameter \
+            --name "/cloud-automation-lab/image-tag" \
+            --type "String" \
+            --value "${{ github.sha }}" \
+            --overwrite
 
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
+  # deploy:
+  #   needs: build-and-push
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: arn:aws:iam::017367776521:role/cloud-automation-lab-github-deploy-role
+  #         aws-region: ${{ env.AWS_REGION }}
 
-      - name: Copy Docker Compose file to EC2
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.prod.yml"
-          target: "/home/ubuntu"
-
-      - name: Deploy on EC2
-        uses: appleboy/ssh-action@v1.2.0
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GHCR_USERNAME: ${{ github.actor }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          envs: GHCR_TOKEN,GHCR_USERNAME,DB_NAME,DB_USER,DB_PASSWORD
-          script: |
-            set -e
-
-            cd /home/ubuntu
-
-            echo "$GHCR_TOKEN" | docker login ghcr.io \
-              --username "$GHCR_USERNAME" \
-              --password-stdin
-
-            cat > .env <<EOF
-            DB_HOST=postgres
-            DB_PORT=5432
-            DB_NAME=$DB_NAME
-            DB_USER=$DB_USER
-            DB_PASSWORD=$DB_PASSWORD
-            POSTGRES_DB=$DB_NAME
-            POSTGRES_USER=$DB_USER
-            POSTGRES_PASSWORD=$DB_PASSWORD
-            EOF
-
-            chmod 600 .env
-
-            export IMAGE_TAG=${{ github.sha }}
-
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
-
-            docker compose -f docker-compose.prod.yml ps
+  #     - name: Deploy through SSM
+  #       run: |
+  #         aws ssm send-command \
+  #           --document-name "AWS-RunShellScript" \
+  #           --targets \
+  #             "Key=tag:Project,Values=cloud-automation-lab" \
+  #             "Key=tag:Role,Values=app" \
+  #           --parameters 'commands=["/usr/local/bin/deploy-app"]'
