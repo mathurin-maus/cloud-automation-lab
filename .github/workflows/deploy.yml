@@ -54,22 +54,22 @@ jobs:
             --value "${{ github.sha }}" \
             --overwrite
 
-  # deploy:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: arn:aws:iam::017367776521:role/cloud-automation-lab-github-deploy-role
-  #         aws-region: ${{ env.AWS_REGION }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::017367776521:role/cloud-automation-lab-github-deploy-role
+          aws-region: ${{ env.AWS_REGION }}
 
-  #     - name: Deploy through SSM
-  #       run: |
-  #         aws ssm send-command \
-  #           --document-name "AWS-RunShellScript" \
-  #           --targets \
-  #             "Key=tag:Project,Values=cloud-automation-lab" \
-  #             "Key=tag:Role,Values=app" \
-  #           --parameters 'commands=["/usr/local/bin/deploy-app"]'
+      - name: Deploy through SSM
+        run: |
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets \
+              "Key=tag:Project,Values=cloud-automation-lab" \
+              "Key=tag:Role,Values=app" \
+            --parameters 'commands=["/usr/local/bin/deploy-app"]'

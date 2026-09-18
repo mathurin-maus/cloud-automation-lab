@@ -39,12 +39,12 @@ variable "target_group_arn" {
 
 variable "min_size" {
   type    = number
-  default = 0
+  default = 2
 }
 
 variable "desired_capacity" {
   type    = number
-  default = 0
+  default = 2
 }
 
 variable "max_size" {

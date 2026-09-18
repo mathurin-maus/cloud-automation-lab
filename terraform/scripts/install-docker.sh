@@ -11,7 +11,16 @@ RDS_SECRET_ARN="${rds_secret_arn}"
 apt-get update
 
 # Docker + tools
-apt-get install -y docker.io awscli jq
+apt-get install -y docker.io jq curl unzip
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" \
+  -o "/tmp/awscliv2.zip"
+
+unzip -q /tmp/awscliv2.zip -d /tmp
+
+/tmp/aws/install
+
+aws --version
 
 systemctl enable docker
 systemctl start docker
