@@ -20,3 +20,8 @@ output "rds_master_secret_arn" {
   description = "ARN of the Secrets Manager secret managed by RDS"
   value       = aws_db_instance.app.master_user_secret[0].secret_arn
 }
+
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = module.load_balancer.alb_dns_name
+}
