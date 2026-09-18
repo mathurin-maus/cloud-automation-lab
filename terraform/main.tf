@@ -13,12 +13,19 @@ module "compute" {
 
   project_name          = var.project_name
   vpc_id                = module.network.vpc_id
-  public_subnet_id      = module.network.public_subnet_ids[0]
+  public_subnet_ids     = module.network.public_subnet_ids
   allowed_ssh_cidr      = var.allowed_ssh_cidr
   instance_type         = var.instance_type
   public_key_path       = var.public_key_path
   user_data_path        = var.user_data_path
   alb_security_group_id = module.load_balancer.alb_security_group_id
+  target_group_arn      = module.load_balancer.target_group_arn
+  desired_image_tag_arn = aws_ssm_parameter.desired_image_tag.arn
+  rds_secret_arn        = aws_db_instance.app.master_user_secret[0].secret_arn
+  rds_address           = aws_db_instance.app.address
+  aws_region            = var.aws_region
+  ecr_repository_url    = aws_ecr_repository.app.repository_url
+  image_tag_parameter   = aws_ssm_parameter.desired_image_tag.name
 }
 
 module "load_balancer" {
@@ -29,7 +36,3 @@ module "load_balancer" {
   public_subnet_ids = module.network.public_subnet_ids
 }
 
-resource "aws_lb_target_group_attachment" "app" {
-  target_group_arn = module.load_balancer.target_group_arn
-  target_id        = module.compute.ec2_id
-}
